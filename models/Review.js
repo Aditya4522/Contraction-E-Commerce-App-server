@@ -47,4 +47,4 @@ const reviewSchema = Schema(
 
 const Review = Mongoose.model("Review", reviewSchema);
 
-module.exports = Review;
+export default Review;

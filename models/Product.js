@@ -1,5 +1,6 @@
 import mongoose, { Mongoose } from "mongoose";
 import Review from "./Review";
+import Pincode from "./Pincode";
 
 const Schema = Mongoose.Schema;
 
@@ -43,6 +44,7 @@ const productSchema = Schema(
       type: Boolean,
       default: false,
     },
+  
   },
   { timestamps: true }
 );
@@ -61,4 +63,4 @@ if(reviews.length >0){
 
 
 const Product = mongoose.model("Product", productSchema);
-module.exports = Product;
+export default Product;

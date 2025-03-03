@@ -8,5 +8,5 @@ const pincodeSchema = new mongoose.Schema({
     }
 },{timestamps:true});
 
-const Pincode = mongoose.model("Pincode", PincodeSchema);
-module.exports = Pincode;
+const Pincode = mongoose.model("Pincode", pincodeSchema);
+ export default Pincode;

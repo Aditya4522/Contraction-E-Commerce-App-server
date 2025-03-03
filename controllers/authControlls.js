@@ -1,34 +1,41 @@
-import User from "../models/User";
-import Admin from "../models/Admin";
-import bcrypt from "bcryptjs";
+import User from "../models/User.js";
+import Admin from "../models/Admin.js";
+import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
   const { name, email, password, phone } = req.body;
 
   try {
     let user = await User.findOne({ email });
 
     if (user) {
-      return res
-        .status(400)
-        .json({ error: "User already exists and can you try another email" });
+      return res.status(400).json({
+        success: false,
+        error: "User already exists, please try another email",
+      });
     }
 
-    // password hashing
-    const hesshedPassword = await bcrypt.hash(password, 15);
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     user = new User({
       name,
       email,
-      password: hesshedPassword,
+      password: hashedPassword,
       phone,
     });
+
     await user.save();
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     return res.status(201).json({
       success: true,
       message: "User created successfully",
+      token,
     });
   } catch (error) {
     console.error(`Error signing up user: ${error.message}`);
@@ -36,7 +43,7 @@ const signup = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -45,7 +52,7 @@ const login = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "user not found" });
+        .json({ success: false, message: "User not found" });
     }
 
     const comparePassword = await bcrypt.compare(password, user.password);
@@ -53,7 +60,7 @@ const login = async (req, res) => {
     if (!comparePassword) {
       return res
         .status(400)
-        .json({ success: false, message: "invalid password" });
+        .json({ success: false, message: "Invalid password" });
     }
 
     const token = jwt.sign(
@@ -63,7 +70,7 @@ const login = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "user logged in successfully",
+      message: "User logged in successfully",
       token,
       user: {
         id: user._id,
@@ -78,53 +85,56 @@ const login = async (req, res) => {
   }
 };
 
-const adminSignup = async (req, res) => {
-  const { email, password } = req.body;
+export const adminSignup = async (req, res) => {
+  const { email, password, username } = req.body; // ✅ Include username
 
   try {
-    let admin = Admin.findOne({ email });
+    let admin = await Admin.findOne({ email });
     if (admin) {
       return res
         .status(400)
         .json({ success: false, message: "Admin already exists" });
     }
 
-    const securePassword = bcrypt.hash(password, 15);
+    const securePassword = await bcrypt.hash(password, 10);
 
     admin = new Admin({
       username,
+      email,
       password: securePassword,
     });
 
     await admin.save();
 
     return res
-      .status(200)
-      .json({ success: true, message: "admin signup successfully" });
+      .status(201)
+      .json({ success: true, message: "Admin signed up successfully" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-const adminLogin = async (req, res) => {
+export const adminLogin = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    let admin = Admin.findOne({ username });
+    let admin = await Admin.findOne({ username });
 
     if (!admin) {
       return res
         .status(404)
-        .json({ success: false, message: "user not found" });
+        .json({ success: false, message: "Admin not found" });
     }
-    const comparePassword = bcrypt.compare(password, admin.password);
+
+    const comparePassword = await bcrypt.compare(password, admin.password);
 
     if (!comparePassword) {
       return res.status(400).json({
         success: false,
-        message: "invalid password",
+        message: "Invalid password",
       });
     }
+
     const token = jwt.sign(
       { id: admin._id, role: admin.role },
       process.env.JWT_SECRET,
@@ -135,7 +145,7 @@ const adminLogin = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "admin login successfully",
+      message: "Admin login successful",
       token,
       admin: {
         id: admin._id,
@@ -148,4 +158,5 @@ const adminLogin = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, adminSignup,adminLogin };
+
+// export { signup, login, adminSignup, adminLogin };

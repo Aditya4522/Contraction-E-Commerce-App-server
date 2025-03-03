@@ -1,4 +1,4 @@
-import e from "express";
+import express from "express";
 import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
@@ -43,4 +43,4 @@ const userSchema = Schema(
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = User;
+export default User;
