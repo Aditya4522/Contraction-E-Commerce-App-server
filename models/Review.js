@@ -1,8 +1,8 @@
-import { model, Mongoose } from "mongoose";
+import mongoose from 'mongoose';
 
-const Schema = Mongoose.Schema;
+const { Schema } = mongoose;
 
-const repliesSchema = Schema(
+const repliesSchema = new Schema(
   {
     review: {
       type: String,
@@ -10,18 +10,18 @@ const repliesSchema = Schema(
     },
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
   },
   { timestamps: true }
 );
 
-const reviewSchema = Schema(
+const reviewSchema = new Schema(
   {
     productId: {
       type: Schema.Types.ObjectId,
-      ref: "Product",
+      ref: 'Product',
       required: true,
     },
     review: {
@@ -36,7 +36,7 @@ const reviewSchema = Schema(
     },
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     replies: [repliesSchema],
@@ -44,7 +44,6 @@ const reviewSchema = Schema(
   { timestamps: true }
 );
 
-
-const Review = Mongoose.model("Review", reviewSchema);
+const Review = mongoose.model('Review', reviewSchema);
 
 export default Review;

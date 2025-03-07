@@ -1,8 +1,8 @@
-import mongoose, { Mongoose } from "mongoose";
-import Review from "./Review";
-import Pincode from "./Pincode";
+import mongoose from "mongoose";
+import Review from "./Review.js";
 
-const Schema = Mongoose.Schema;
+
+const Schema = mongoose.Schema;
 
 const productSchema = Schema(
   {
