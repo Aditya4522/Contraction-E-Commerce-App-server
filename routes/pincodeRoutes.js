@@ -1,5 +1,5 @@
 import express from "express";
-import  {addPincodes,getPincode} from "../controllers/pincodeControlls.js"; 
+import  {addPincodes,getPincode} from "../controllers/pincodeControllers.js"; 
 import { verifyToken } from "../Middlewares/verifyToken.js"; // Ensure correct folder casing
 
 const router = express.Router();

@@ -6,7 +6,7 @@ import {
   blacklistedProduct,
   getProductbyName,
   reoveFromBlacklist,getProducts
-} from "../controllers/productControlls.js";
+} from "../controllers/productControllers.js";
 import { verifyToken } from "../Middlewares/verifyToken.js";
 import upload from "../Middlewares/multer.js";
 
