@@ -13,13 +13,13 @@ dotenv.config();
 
 const app = express();
 
-// 🔥 Proper CORS configuration
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // ✅ Allow frontend origin
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Allowed HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // ✅ Allowed headers
-    credentials: true, // ✅ Allow cookies & authentication headers
+    origin: process.env.CLIENT_URL || "http://localhost:5173", 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, 
   })
 );
 
@@ -38,8 +38,8 @@ app.use("/api", productRoutes);
 app.use("/api", reviewRoutes);
 app.use("/api", orderRoutes);
 
-// ✅ Handle preflight requests properly
-app.options("*", cors()); // Handles CORS for all routes
+
+app.options("*", cors());
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
