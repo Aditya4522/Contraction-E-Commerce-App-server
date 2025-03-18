@@ -55,9 +55,9 @@ export const ChangePassword = async (req, res) => {
   }
 
   try {
-    const { id, previousPassword, newPassword } = req.body;
+    const { userId ,previousPassword, newPassword } = req.body;
 
-    if (!id) {
+    if (!userId) {
       return res.status(400).json({
         success: false,
         message: "User ID is required",
@@ -71,7 +71,7 @@ export const ChangePassword = async (req, res) => {
       });
     }
 
-    let user = await Admin.findById(id);
+    let user = await Admin.findById(userId);
 
     if (!user) {
       return res.status(404).json({
