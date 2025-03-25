@@ -1,3 +1,5 @@
+dotenv.config({ path: '.env' });
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -9,17 +11,16 @@ import productRoutes from "./routes/productRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import orderRoutes from "./routes/OrderRoutes.js";
 
-dotenv.config();
+
 
 const app = express();
 
-
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", 
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, 
+    credentials: true,
   })
 );
 
@@ -28,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT ;
 
 // ✅ Routes
 app.use("/api/auth", authRouter);
@@ -37,7 +38,6 @@ app.use("/api", settingRoutes);
 app.use("/api", productRoutes);
 app.use("/api", reviewRoutes);
 app.use("/api", orderRoutes);
-
 
 app.options("*", cors());
 

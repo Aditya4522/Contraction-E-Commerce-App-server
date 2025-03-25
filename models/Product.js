@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 import Review from "./Review.js";
 
-
 const Schema = mongoose.Schema;
 
-const productSchema = Schema(
+const productSchema = new Schema(
   {
     name: {
       type: String,
@@ -44,23 +43,23 @@ const productSchema = Schema(
       type: Boolean,
       default: false,
     },
-  
   },
   { timestamps: true }
 );
 
-productSchema.method.calculateRating = async ()=>{
-const reviews = await Review.find({productId: this._id});
-if(reviews.length === 0) return 0;
-if(reviews.length >0){
-  const totalRating = reviews.reduce((acc, review)=> acc + review.rating, 0);
-  this.rating = totalRating/reviews.length;
+// Fix: Use 'methods' instead of 'method'
+productSchema.methods.calculateRating = async function () {
+  const reviews = await Review.find({ productId: this._id });
+
+  if (reviews.length === 0) {
+    this.rating = 0;
+  } else {
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    this.rating = totalRating / reviews.length;
+  }
 
   await this.save();
-}
-}
-
-
+};
 
 const Product = mongoose.model("Product", productSchema);
 export default Product;

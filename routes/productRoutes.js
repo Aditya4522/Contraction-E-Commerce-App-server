@@ -3,13 +3,13 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-  blacklistedProduct,
-  getProductbyName,
-  reoveFromBlacklist,getProducts
+  blacklistProduct,
+  removeFromBlacklist, // Fixed function name
+  getProducts,
+  getProductByName,
 } from "../controllers/productControllers.js";
 import { verifyToken } from "../Middlewares/verifyToken.js";
 import upload from "../Middlewares/multer.js";
-
 const router = express.Router();
 
 router.post(
@@ -18,11 +18,12 @@ router.post(
   upload.array("images", 4),
   createProduct
 );
-router.put("/update-product", verifyToken, updateProduct);
-router.delete("/delete-product/:id",verifyToken,deleteProduct);
-router.get("/get-products",getProducts);
-router.get("/get-product-by-name/:name",getProductbyName );
-router.put("/blacklist-product/:id", verifyToken,blacklistedProduct);
-router.put("/remove-from-blacklisted/:id",verifyToken,reoveFromBlacklist);
+
+router.put("/update-product/:id", verifyToken, updateProduct);
+router.delete("/delete-product/:id", verifyToken, deleteProduct);
+router.get("/get-products", getProducts);
+router.get("/get-product-by-name/:name", getProductByName); // Fixed function name
+router.put("/blacklist-product/:id", verifyToken, blacklistProduct);
+router.put("/remove-from-blacklist/:id", verifyToken, removeFromBlacklist); // Fixed function name
 
 export default router;

@@ -1,6 +1,9 @@
 import multer from "multer";
 
+// Configure storage
 const storage = multer.diskStorage({});
-const upload = multer({ storage });
 
-export default upload
+// Initialize multer
+const upload = multer({storage,});
+
+export default upload;

@@ -1,9 +1,9 @@
-import express from "express";
 import mongoose from "mongoose";
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
+
 // User Schema
-const userSchema = Schema(
+const userSchema = new Schema(
   {
     name: {
       type: String,
