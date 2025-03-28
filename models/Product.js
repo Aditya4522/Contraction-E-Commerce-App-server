@@ -43,6 +43,10 @@ const productSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    category:{
+      type : String,
+      required: true
+    }
   },
   { timestamps: true }
 );

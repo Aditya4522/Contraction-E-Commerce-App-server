@@ -111,40 +111,43 @@ export const getProducts = async (req, res) => {
     limit = parseInt(limit) || 9;
 
     let query = {};
+
     if (category) {
-      query.category = category.charAt(0).toUpperCase() + category.slice(1);
+      category = category.charAt(0).toUpperCase() + category.slice(1);
+      if (category.toLowerCase() !== "all") {
+        query.category = category;
+      }
     }
-    if (category == "all") delete query.category;
+
     if (search) query.name = { $regex: search, $options: "i" };
-    if (price > 0) query.price = { $lte: price };
+
+    if (!isNaN(price) && Number(price) > 0) query.price = { $lte: Number(price) };
+
     if (req.role !== ROLES.admin) query.blacklisted = { $ne: true };
 
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / limit);
+    
     const products = await Product.find(query)
-      .select("name price description and blacklist")
+      .select("name price description blacklisted images")
       .skip(limit * (page - 1))
       .limit(limit);
 
-    let newProductAarry = [];
-
-    products.forEach((product) => {
-      const ProductObj = product.toObject();
-      ProductObj.image = product.images[0].url;
-      delete ProductObj.images;
-      newProductAarry.push(ProductObj);
+    let newProductArray = products.map((product) => {
+      const productObj = product.toObject();
+      productObj.image = product.images?.[0]?.url || "default_image_url_here";
+      delete productObj.images;
+      return productObj;
     });
 
     if (!products.length) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Products not found" });
+      return res.status(404).json({ success: false, message: "Products not found" });
     }
 
     return res.status(200).json({
       success: true,
       message: "Products fetched successfully",
-      data: newProductAarry,
+      data: newProductArray,
       pagination: {
         totalPages,
         totalProducts,
@@ -153,9 +156,11 @@ export const getProducts = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error in getProducts:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 export const getProductByName = async (req, res) => {
   try {
