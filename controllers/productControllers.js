@@ -107,43 +107,53 @@ export const deleteProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
   try {
     let { page, limit, search, price, category } = req.query;
-    page = parseInt(page) || 1;
-    limit = parseInt(limit) || 9;
+    page = parseInt(page, 10) || 1;
+    limit = parseInt(limit, 10) || 9;
+
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 9;
 
     let query = {};
 
     if (category) {
       category = category.charAt(0).toUpperCase() + category.slice(1);
       if (category.toLowerCase() !== "all") {
-        query.category = category;
+        query.category = { $regex: new RegExp(`^${category}$`, 'i') }; 
       }
     }
 
-    if (search) query.name = { $regex: search, $options: "i" };
-
-    if (!isNaN(price) && Number(price) > 0) query.price = { $lte: Number(price) };
-
-    if (req.role !== ROLES.admin) query.blacklisted = { $ne: true };
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+    if (!isNaN(price) && Number(price) > 0) {
+      query.price = { $lte: Number(price) };
+    }
+    if (req.role !== ROLES.admin) {
+      query.blacklisted = { $ne: true };
+    }
 
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / limit);
-    
+
     const products = await Product.find(query)
-      .select("name price description blacklisted images")
+      .select("name price description blacklisted images rating category")  // Include rating field here
       .skip(limit * (page - 1))
       .limit(limit);
 
-    let newProductArray = products.map((product) => {
+    const newProductArray = products.map((product) => {
       const productObj = product.toObject();
-      productObj.image = product.images?.[0]?.url || "default_image_url_here";
-      delete productObj.images;
-      return productObj;
+      productObj.image = product.images?.[0]?.url || "default_image_url_here";  
+      delete productObj.images;  
+      return productObj;  
     });
+
+    // console.log(newProductArray);
 
     if (!products.length) {
       return res.status(404).json({ success: false, message: "Products not found" });
     }
 
+    // Return the fetched products with pagination details and rating
     return res.status(200).json({
       success: true,
       message: "Products fetched successfully",
@@ -153,6 +163,7 @@ export const getProducts = async (req, res) => {
         totalProducts,
         currentPage: page,
         pageSize: limit,
+        category
       },
     });
   } catch (error) {
@@ -162,22 +173,25 @@ export const getProducts = async (req, res) => {
 };
 
 
-export const getProductByName = async (req, res) => {
+
+export const getProductId = async (req, res) => {
   try {
-    const { name } = req.params;
-    const product = await Product.findOne({ name });
-    if (!product)
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
+    }
 
-      return res
-      .status(200)
-      .json({ success: true, message: "Product found", data: product });
+    return res.status(200).json({ success: true, message: "Product found", data: product });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 export const blacklistProduct = async (req, res) => {
   if (req.role !== ROLES.admin) {

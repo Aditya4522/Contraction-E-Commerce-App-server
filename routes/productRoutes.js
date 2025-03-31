@@ -6,7 +6,7 @@ import {
   blacklistProduct,
   removeFromBlacklist, // Fixed function name
   getProducts,
-  getProductByName,
+  getProductId,
 } from "../controllers/productControllers.js";
 import { verifyToken } from "../Middlewares/verifyToken.js";
 import upload from "../Middlewares/multer.js";
@@ -22,8 +22,8 @@ router.post(
 router.put("/update-product/:id", verifyToken, updateProduct);
 router.delete("/delete-product/:id", verifyToken, deleteProduct);
 router.get("/get-products", getProducts);
-router.get("/get-product-by-name/:name", getProductByName); // Fixed function name
+router.get("/get-product-by-id/:id", getProductId);
 router.put("/blacklist-product/:id", verifyToken, blacklistProduct);
-router.put("/remove-from-blacklist/:id", verifyToken, removeFromBlacklist); // Fixed function name
+router.put("/remove-from-blacklist/:id", verifyToken, removeFromBlacklist); 
 
 export default router;
