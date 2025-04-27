@@ -3,48 +3,44 @@ import crypto from "crypto"; // Added missing import
 import User from "../models/User.js";
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
-import { validatePaymentVerification } from 'razorpay/dist/utils/razorpay-utils';
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-export const genratePayment = async (req, res) => {
+export const generatePayment = async (req, res) => {
   const userId = req.id;
 
   try {
     const { amount } = req.body;
-    const options = {
-      amount: amount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-      currency: "INR",
-      receipt: Math.random().toString(36).substring(2),
-    };
+    console.log("Requested amount:", amount);
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "user not found",
-      });
+      console.log("User not found for ID:", userId);
+      return res.status(404).json({ success: false, message: "User not found" });
     }
-    
-    instance.orders.create(options, async (err, order) => {
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          message: err.message, // Changed from error.message to err.message
-        });
-      }
-      return res.status(200).json({
-        success: true,
-        data: {
-          ...order,
-          name: user.name,
-        },
-      });
+
+    const options = {
+      amount: amount * 100, // convert to paise
+      currency: "INR",
+      receipt: `receipt_${Math.random().toString(36).slice(2, 10)}`,
+    };
+
+    const order = await instance.orders.create(options);
+
+    console.log("Razorpay order created successfully:", order);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        ...order,
+        name: user.name,
+      },
     });
   } catch (error) {
+    console.error("Server error in generatePayment:", error);
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -52,17 +48,19 @@ export const genratePayment = async (req, res) => {
   }
 };
 
+
+
 export const verifyPayment = async (req, res) => {
   const userId = req.id;
 
   try {
-    const { razorpay_order_id, razorpay_payment_id, amount, productArray, address } = req.body; // Added address to destructuring
+    const { razorpay_order_id, razorpay_payment_id, amount, productArray, address } = req.body; 
 
-    const signature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET) // Fixed typo: createHamc -> createHmac
+    const signature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET) 
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
       
-    const validatePayment = validatePaymentVerification(
+    const validatePayment = Razorpay(
       { "order_id": razorpay_order_id, "payment_id": razorpay_payment_id }, 
       signature, 
       process.env.RAZORPAY_KEY_SECRET

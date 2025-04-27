@@ -10,6 +10,7 @@ import settingRoutes from "./routes/settingRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import orderRoutes from "./routes/OrderRoutes.js";
+import paymentRoutes from './routes/paymentRoutes.js'
 
 
 
@@ -17,7 +18,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -31,13 +32,13 @@ connectDB();
 
 const PORT = process.env.PORT ;
 
-// ✅ Routes
 app.use("/api/auth", authRouter);
 app.use("/api", pincodeRoutes);
 app.use("/api", settingRoutes);
 app.use("/api", productRoutes);
 app.use("/api", reviewRoutes);
 app.use("/api", orderRoutes);
+app.use("/api", paymentRoutes);
 
 app.options("*", cors());
 
