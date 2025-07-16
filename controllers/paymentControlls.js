@@ -1,13 +1,17 @@
 import Razorpay from "razorpay";
-import crypto from "crypto"; // Added missing import
+import crypto from "crypto"; 
 import User from "../models/User.js";
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
+import { log } from "console";
+
+console.log(`instance ${process.env.RAZORPAY_KEY_ID}, ${process.env.RAZORPAY_KEY_SECRET}`);
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
+
 
 export const generatePayment = async (req, res) => {
   const userId = req.id;
@@ -81,7 +85,7 @@ export const verifyPayment = async (req, res) => {
       
       await Product.findByIdAndUpdate(
         { _id: product.id },
-        { $inc: { stock: -product.quantity } } // Changed $push to $inc for stock adjustment
+        { $inc: { stock: -product.quantity } } 
       );
     }
     

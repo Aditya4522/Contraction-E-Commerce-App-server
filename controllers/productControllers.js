@@ -136,7 +136,7 @@ export const getProducts = async (req, res) => {
     const totalPages = Math.ceil(totalProducts / limit);
 
     const products = await Product.find(query)
-      .select("name price description blacklisted images rating category")  // Include rating field here
+      .select("name price description blacklisted images rating category")
       .skip(limit * (page - 1))
       .limit(limit);
 
